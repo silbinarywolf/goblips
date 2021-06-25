@@ -28,6 +28,10 @@ var (
 	NeedRuntimeType = func(*types.Type) {}
 )
 
+const (
+	disallowUnusedLocals = false
+)
+
 func AssignExpr(n ir.Node) ir.Node { return typecheck(n, ctxExpr|ctxAssign) }
 func Expr(n ir.Node) ir.Node       { return typecheck(n, ctxExpr) }
 func Stmt(n ir.Node) ir.Node       { return typecheck(n, ctxStmt) }
@@ -2177,10 +2181,14 @@ func CheckUnused(fn *ir.Func) {
 			if defn.Used {
 				continue
 			}
-			base.ErrorfAt(defn.Tag.Pos(), "%v declared but not used", ln.Sym())
+			if disallowUnusedLocals {
+				base.ErrorfAt(defn.Tag.Pos(), "%v declared but not used", ln.Sym())
+			}
 			defn.Used = true // suppress repeats
 		} else {
-			base.ErrorfAt(ln.Pos(), "%v declared but not used", ln.Sym())
+			if disallowUnusedLocals {
+				base.ErrorfAt(ln.Pos(), "%v declared but not used", ln.Sym())
+			}
 		}
 	}
 }

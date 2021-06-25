@@ -32,6 +32,10 @@ import (
 	"cmd/internal/src"
 )
 
+const (
+	disallowUnusedImports = false
+)
+
 // Temporary import helper to get type2-based type-checking going.
 type gcimports struct {
 	packages map[string]*types2.Package
@@ -425,7 +429,7 @@ func clearImports() {
 			// errors if a conflicting top-level name is
 			// introduced by a different file.
 			p := n.(*ir.PkgName)
-			if !p.Used && base.SyntaxErrors() == 0 {
+			if disallowUnusedImports && !p.Used && base.SyntaxErrors() == 0 {
 				unused = append(unused, importedPkg{p.Pos(), p.Pkg.Path, s.Name})
 			}
 			s.Def = nil
@@ -440,17 +444,21 @@ func clearImports() {
 		}
 	}
 
-	sort.Slice(unused, func(i, j int) bool { return unused[i].pos.Before(unused[j].pos) })
-	for _, pkg := range unused {
-		pkgnotused(pkg.pos, pkg.path, pkg.name)
+	if disallowUnusedImports {
+		sort.Slice(unused, func(i, j int) bool { return unused[i].pos.Before(unused[j].pos) })
+		for _, pkg := range unused {
+			pkgnotused(pkg.pos, pkg.path, pkg.name)
+		}
 	}
 }
 
 // CheckDotImports reports errors for any unused dot imports.
 func CheckDotImports() {
-	for _, pack := range dotImports {
-		if !pack.Used {
-			base.ErrorfAt(pack.Pos(), "imported and not used: %q", pack.Pkg.Path)
+	if disallowUnusedImports {
+		for _, pack := range dotImports {
+			if !pack.Used {
+				base.ErrorfAt(pack.Pos(), "imported and not used: %q", pack.Pkg.Path)
+			}
 		}
 	}
 
