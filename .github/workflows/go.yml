@@ -17,7 +17,7 @@ jobs:
             go-version: ${{ matrix.go }}
 
         - name: Build
-          shell: bash
+          shell: cmd
           run: |
             cd src
-            source ./make.bash
+            call make.cmd
