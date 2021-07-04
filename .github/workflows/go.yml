@@ -1,0 +1,23 @@
+name: Go
+on: [push, pull_request]
+jobs:
+  windows:
+      runs-on: windows-latest
+      strategy:
+        matrix:
+          go: ['1.16']
+      name: Go ${{ matrix.go }} on Windows
+      steps:
+        - name: Check out code into the Go module directory
+          uses: actions/checkout@v2
+
+        - name: Setup Go
+          uses: actions/setup-go@v2
+          with:
+            go-version: ${{ matrix.go }}
+
+        - name: Build
+          shell: bash
+          run: |
+            cd src
+            source ./make.bash
