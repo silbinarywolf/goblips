@@ -20,4 +20,4 @@ jobs:
           shell: cmd
           run: |
             cd src
-            call make.cmd
+            call make.bat
