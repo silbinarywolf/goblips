@@ -1,5 +1,7 @@
 # Goblips, A Go Programming Language fork
 
+[![Actions Status](https://github.com/silbinarywolf/goblips/workflows/Go/badge.svg)](https://github.com/silbinarywolf/goblips/actions)
+
 Goblips is a fork of Go with the following:
 
 - Allows unused imports

@@ -1,5 +1,5 @@
 name: Go
-on: [push, pull_request]
+on: [push]
 jobs:
   windows:
       runs-on: windows-latest
@@ -50,10 +50,13 @@ jobs:
             cd src
             source ./make.bash
 
-        - name: Test
-          run: |
-            cd src
-            source ./run.bash --no-rebuild
+        # note(jae): 2021-07-04
+        # disabled due to error in Github Actions.
+        # "line 48: ulimit: open files: cannot modify limit: Invalid argument"
+        #- name: Test
+        #  run: |
+        #    cd src
+        #    source ./run.bash --no-rebuild
 
   linux:
       name: Go ${{ matrix.go }} on Ubuntu
