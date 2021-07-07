@@ -1,0 +1,112 @@
+name: Go
+on: [push]
+jobs:
+  windows:
+      runs-on: windows-latest
+      strategy:
+        matrix:
+          go: ['1.16']
+      name: Go ${{ matrix.go }} on Windows
+      env:
+        name: windows
+      steps:
+        - name: Check out code into the Go module directory
+          uses: actions/checkout@v2
+
+        - name: Setup Go
+          uses: actions/setup-go@v2
+          with:
+            go-version: ${{ matrix.go }}
+
+        - name: Build
+          shell: cmd
+          run: |
+            cd src
+            call make.bat
+
+        - name: Test
+          shell: cmd
+          run: |
+            cd src
+            call run.bat --no-rebuild --no-local
+
+        - name: Upload Artifact
+          uses: actions/upload-artifact@v2
+          with:
+            name: ${{ env.name }}
+            path: |
+              bin/
+            if-no-files-found: error
+
+  macos:
+      runs-on: macOS-latest
+      strategy:
+        matrix:
+          go: ['1.16']
+      name: Go ${{ matrix.go }} on MacOS
+      env:
+        name: mac
+      steps:
+        - name: Check out code into the Go module directory
+          uses: actions/checkout@v2
+
+        - name: Setup Go
+          uses: actions/setup-go@v2
+          with:
+            go-version: ${{ matrix.go }}
+
+        - name: Build
+          run: |
+            cd src
+            source ./make.bash
+
+        # note(jae): 2021-07-04
+        # disabled due to error in Github Actions.
+        # "line 48: ulimit: open files: cannot modify limit: Invalid argument"
+        #- name: Test
+        #  run: |
+        #    cd src
+        #    source ./run.bash --no-rebuild
+        
+        - name: Upload Artifact
+          uses: actions/upload-artifact@v2
+          with:
+            name: ${{ env.name }}
+            path: |
+              bin/
+            if-no-files-found: error
+
+  linux:
+      name: Go ${{ matrix.go }} on Ubuntu
+      runs-on: ubuntu-latest
+      strategy:
+        matrix:
+          go: ['1.16']
+      env:
+        name: ubuntu
+      steps:
+        - name: Check out code into the Go module directory
+          uses: actions/checkout@v2
+
+        - name: Setup Go
+          uses: actions/setup-go@v2
+          with:
+            go-version: ${{ matrix.go }}
+
+        - name: Build
+          run: |
+            cd src
+            source ./make.bash
+
+        - name: Test
+          run: |
+            cd src
+            source ./run.bash --no-rebuild
+
+        - name: Upload Artifact
+          uses: actions/upload-artifact@v2
+          with:
+            name: ${{ env.name }}
+            path: |
+              bin/
+            if-no-files-found: error
